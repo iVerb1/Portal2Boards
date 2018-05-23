@@ -461,9 +461,14 @@ class Leaderboard
             $chapter = $maps["maps"][$change["mapId"]]["chapterId"];
             $mapData = $oldBoards[$chapter][$change["mapId"]];
 
+            $banned = 0;
+            if ($change["score"] < 0) {
+                $banned = 1;
+            }
+
             $wr = 0;
             $keys = array_keys($mapData);
-            if ($change["score"] <= $mapData[$keys[0]]["scoreData"]["score"]) {
+            if (!$banned && $change["score"] <= $mapData[$keys[0]]["scoreData"]["score"]) {
                 $wr = 1;
             }
 
@@ -475,8 +480,8 @@ class Leaderboard
                 : "NULL";
 
             Debug::log("Inserting change. Player: ".$change["profileNumber"]." Map: ".$change["mapId"]." Score: ".$change["score"]);
-            Database::query("INSERT INTO changelog(id, profile_number, score, map_id, wr_gain, previous_id, pre_rank)
-              VALUES (NULL, '" . $change["profileNumber"] . "','" . $change["score"] . "','" . $change["mapId"] . "','" . $wr . "', ". $previousId .", ".$preRank.")
+            Database::query("INSERT INTO changelog(id, profile_number, score, map_id, wr_gain, banned, previous_id, pre_rank)
+              VALUES (NULL, '" . $change["profileNumber"] . "','" . $change["score"] . "','" . $change["mapId"] . "','" . $wr . "', '" . $banned . "', " . $previousId .", ".$preRank.")
             ");
 
             $id = Database::getMysqli()->insert_id;
