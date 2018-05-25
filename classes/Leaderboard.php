@@ -1100,9 +1100,14 @@ class Leaderboard
         $oldBoards = self::getBoard(array("chamber" => $chamber));
         $oldChamberBoard = $oldBoards[$chapter][$chamber];
 
+        $banned = 0;
+        if ($score < 0) {
+            $banned = 1;
+        }
+
         $wr = 0;
         $keys = array_keys($oldChamberBoard);
-        if ($score <= $oldChamberBoard[$keys[0]]["scoreData"]["score"]) {
+        if (!$banned && $score <= $oldChamberBoard[$keys[0]]["scoreData"]["score"]) {
             $wr = 1;
         }
 
@@ -1114,8 +1119,8 @@ class Leaderboard
             ? $oldChamberBoard[$profileNumber]["scoreData"]["changelogId"]
             : "NULL";
 
-        Database::query("INSERT INTO changelog(id, profile_number, score, map_id, wr_gain, previous_id, pre_rank, submission, note)
-              VALUES (NULL, '" . $profileNumber . "','" . $score . "','" . $chamber . "','" . $wr . "', ". $previousId .", ".$preRank.", 1, '".$comment."')
+        Database::query("INSERT INTO changelog(id, profile_number, score, map_id, wr_gain, banned, previous_id, pre_rank, submission, note)
+              VALUES (NULL, '" . $profileNumber . "','" . $score . "','" . $chamber . "','" . $wr . "', '" . $banned . "', ". $previousId .", ".$preRank.", 1, '".$comment."')
             ");
 
         $id = Database::getMysqli()->insert_id;
