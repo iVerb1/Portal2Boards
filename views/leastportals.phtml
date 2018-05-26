@@ -4,7 +4,7 @@
 <script>
     function goToSteamPage(evt, map) {
         if ($(evt.target).hasClass("chamberimage") || $(evt.target).hasClass("portalamount") || $(evt.target).hasClass("portalsused")) {
-            location.href = 'http://steamcommunity.com/stats/Portal2/leaderboards/' + map;
+            location.href = 'https://steamcommunity.com/stats/Portal2/leaderboards/' + map;
         }
     }
 </script>
@@ -19,30 +19,28 @@
         <div class="chambers">
             <?php foreach($view->board[$chapter] as $steamId => $boardData): ?>
                 <?php $steamIdTime = $mapInfo["lpMaps"][$steamId]; ?>
+                <?php if (!$steamIdTime) $steamIdTime = $steamId; ?>
                 <?php $mapData = $mapInfo["maps"][$steamIdTime]; ?>
                 <?php $grammar = ($boardData["portals"] != 1) ? "Portals" : "Portal"; ?>
 				<div class="chamber leastportals">
-				<div class="chamberimage" onclick="goToSteamPage(event, <?=$steamIdTime?>)" style="background: url('/images/chambers/<?=$steamIdTime;?>.jpg')">
+                <div class="chamberimage"
+                    <?=($mapData["isPublic"]) ? 'onclick="goToSteamPage(event, '.$steamIdTime.')"' : ''?>
+                    style="background: url('/images/chambers/<?=$steamIdTime;?>.jpg'); <?=($mapData["isPublic"]) ? '' : 'cursor: default'?>">
 					<div class="chambertitle">
 						<div class="titlebghelper"></div>
-						<div class="titlebg"><a href="http://steamcommunity.com/stats/Portal2/leaderboards/<?=$steamId;?>"><?=$mapData["mapName"]; ?></a></div>
+						<div class="titlebg"><a<?=($mapData["isPublic"]) ? ' href="https://steamcommunity.com/stats/Portal2/leaderboards/'.$steamId.'"' : ''?>><?=$mapData["mapName"]; ?></a></div>
                         <div class="chamber_icons_right">
-                            <?php if ($boardData["youtubeId"] != NULL): ?>
-                                <span class="icons youtubeEmbedButton fa-stack"
-                                      onclick="embedOnBody(
-                                          '<?=$boardData["youtubeId"]?>',
-                                          '<?=$mapData["mapName"]?> - <?=$boardData["portals"]?> <?=$grammar?>')">
-                                        <i class="fa fa-square fa-stack-1x"></i>
-                                        <i class="fa fa-youtube-play fa-stack-2x"></i>
-                                    </span>
-                            <?php endif; ?>
+                            <span class="icons youtubeEmbedButton fa-stack"
+                                onclick="window.open('https://www.youtube.com/results?search_query=Portal+2+<?=$mapData["mapName"]?>+<?=$boardData["portals"]?>+<?=$grammar?>')">
+                                <i class="fa fa-square fa-stack-1x"></i>
+                                <i class="fa fa-youtube-play fa-stack-2x"></i>
+                            </span>
                         </div>
 					</div>
 					<div class="portalsused">
 						<div class="portalamount"><?=$boardData["portals"];?></div><?=$grammar;?>
 					</div>
 				</div>
-
 			</div>
 		<?php endforeach; ?>
 		</div>

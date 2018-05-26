@@ -1174,18 +1174,16 @@ class Leaderboard
     public static function getLeastPortalsBoard($mode)
     {
 
-        $data = Database::query("SELECT lp.steam_id, lp.portals, chapters.id as chapterId, youtube_id
+        $data = Database::query("SELECT lp.steam_id, lp.portals, chapters.id as chapterId
 								FROM leastportals AS lp
-								INNER JOIN maps ON lp.steam_id = maps.lp_id
+								INNER JOIN maps ON lp.steam_id = maps.steam_id OR lp.steam_id = maps.lp_id
 								INNER JOIN chapters ON maps.chapter_id = chapters.id
 								WHERE maps.is_coop = '{$mode}'
 								ORDER BY chapters.is_multiplayer ASC, maps.id ASC
 								");
         while ($row = $data->fetch_assoc()) {
             $board[$row["chapterId"]][$row["steam_id"]]["portals"] = $row["portals"];
-            $board[$row["chapterId"]][$row["steam_id"]]["youtubeId"] = $row["youtube_id"];
         }
         return $board;
     }
-
 }
