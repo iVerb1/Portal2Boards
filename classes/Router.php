@@ -306,6 +306,10 @@ class Router {
                     exit;
                 }
 
+                if (strlen($_POST["comment"]) > 100) {
+                    exit;
+                }
+
                 if (SteamSignIn::hasProfilePrivileges($_POST["profileNumber"])) {
                     $id = Leaderboard::submitChange($_POST["profileNumber"], $_POST["chamber"], $_POST["score"], $_POST["youtubeID"], $_POST["comment"]);
 

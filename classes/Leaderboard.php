@@ -1161,7 +1161,7 @@ class Leaderboard
 
     public static function setComment($id, $comment)
     {
-        if ($comment != null && $comment != "") {
+        if ($comment != null && $comment != "" && strlen($comment) <= 100) {
             $comment = Database::getMysqli()->real_escape_string($comment);
             print_r($comment);
             print_r($id);

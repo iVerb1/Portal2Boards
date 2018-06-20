@@ -16,7 +16,7 @@
             <form name="filters" action="/changelog" method="get">
                 <div style="float: left;" class="input">
                     <label for="nickname">Nickname</label>
-                    <input type="text" name="boardName" value="<?=$param['boardName'];?>">
+                    <input type="text" name="boardName" value="<?= htmlspecialchars($param['boardName']);?>">
                 </div>
                 <div style="float: left;" class="input">
                     <label for="profilenumber">Steam profile number</label>
@@ -254,22 +254,24 @@
         }
     });
 
-    function setBannedStatus(id, banStatus, clickEventTarget) {
-        $.ajax({
-            url: '/setScoreBanStatus',
-            type: 'POST',
-            success: function (data) {
-                var parent = $(clickEventTarget).parent().parent();
-                var oldDiv = (banStatus == 1) ? parent.find(".ban") : parent.find(".unban");
-                var newDiv = (banStatus == 0) ? parent.find(".ban") : parent.find(".unban");
-                newDiv.show();
-                oldDiv.hide();
-            },
-            data: {
-                id: id,
-                banStatus: banStatus
-            }
-        });
-    }
+    <?php if(SteamSignIn::loggedInUserIsAdmin()): ?>
+        function setBannedStatus(id, banStatus, clickEventTarget) {
+            $.ajax({
+                url: '/setScoreBanStatus',
+                type: 'POST',
+                success: function (data) {
+                    var parent = $(clickEventTarget).parent().parent();
+                    var oldDiv = (banStatus == 1) ? parent.find(".ban") : parent.find(".unban");
+                    var newDiv = (banStatus == 0) ? parent.find(".ban") : parent.find(".unban");
+                    newDiv.show();
+                    oldDiv.hide();
+                },
+                data: {
+                    id: id,
+                    banStatus: banStatus
+                }
+            });
+        }
+    <?php endif; ?>
 
 </script>
