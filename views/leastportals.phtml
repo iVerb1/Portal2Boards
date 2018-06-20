@@ -28,7 +28,7 @@
                     style="background: url('/images/chambers/<?=$steamIdTime;?>.jpg'); <?=($mapData["isPublic"]) ? '' : 'cursor: default'?>">
 					<div class="chambertitle">
 						<div class="titlebghelper"></div>
-						<div class="titlebg"><a<?=($mapData["isPublic"]) ? ' href="https://steamcommunity.com/stats/Portal2/leaderboards/'.$steamId.'"' : ''?>><?=$mapData["mapName"]; ?></a></div>
+						<div class="titlebg"><a<?=($mapData["isPublic"]) ? ' href="https://steamcommunity.com/stats/Portal2/leaderboards/'.$steamId.'"' : ' style="text-decoration: unset"'?>><?=$mapData["mapName"]; ?></a></div>
                         <div class="chamber_icons_right">
                             <span class="icons youtubeEmbedButton fa-stack"
                                 onclick="window.open('https://www.youtube.com/results?search_query=Portal+2+<?=$mapData["mapName"]?>+<?=$boardData["portals"]?>+<?=$grammar?>')">
