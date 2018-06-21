@@ -16,11 +16,11 @@
             <form name="filters" action="/changelog" method="get">
                 <div style="float: left;" class="input">
                     <label for="nickname">Nickname</label>
-                    <input type="text" name="boardName" value="<?= htmlspecialchars($param['boardName']);?>">
+                    <input type="text" name="boardName" value="<?=htmlspecialchars($param['boardName']);?>">
                 </div>
                 <div style="float: left;" class="input">
                     <label for="profilenumber">Steam profile number</label>
-                    <input type="text" name="profileNumber" value="<?=$param['profileNumber'];?>">
+                    <input type="text" name="profileNumber" value="<?=htmlspecialchars($param['profileNumber']);?>">
                 </div>
                 <div style="float: left;" class="input">
                     <label for="profilenumber">Chapter name</label>
@@ -30,7 +30,7 @@
                             <option disabled><?=$mode?></option>
                             <?php foreach($mapInfo["modes"][$modeId] as $chapterId): ?>
                                 <?php $chapterName = $mapInfo["chapters"][$chapterId]["chapterName"]?>
-                                <option value="<?=$chapterId?>" <?php if($param['chapter'] == $chapterId) : ?>selected<?php endif; ?>>&nbsp;&nbsp;<?=$chapterName?></option>
+                                <option value="<?=htmlspecialchars($chapterId);?>" <?php if($param['chapter'] == $chapterId) : ?>selected<?php endif; ?>>&nbsp;&nbsp;<?=$chapterName?></option>
                             <?php endforeach; ?>
                         <?php endforeach; ?>
                     </select>
@@ -45,7 +45,7 @@
                                 <option disabled>&nbsp;&nbsp;<?=$mapInfo["chapters"][$chapterId]["chapterName"]?></option>
                                 <?php foreach($mapInfo["chapters"][$chapterId]["maps"] as $mapId): ?>
                                     <?php $mapName = $mapInfo["maps"][$mapId]["mapName"]?>
-                                    <option value="<?=$mapId?>" <?php if($param['chamber'] == $mapId): ?>selected<?php endif; ?>>&nbsp;&nbsp;&nbsp;&nbsp;<?=$mapName?></option>
+                                    <option value="<?=htmlspecialchars($mapId);?>" <?php if($param['chamber'] == $mapId): ?>selected<?php endif; ?>>&nbsp;&nbsp;&nbsp;&nbsp;<?=$mapName?></option>
                                 <?php endforeach; ?>
                             <?php endforeach; ?>
                         <?php endforeach; ?>
@@ -54,32 +54,32 @@
                 <div style="float: left;" class="check">
                     <div style="position: relative;">Single Player</div>
                     <div class="checkbox <?php if($param['sp'] == "1"): ?>ticked<?php endif; ?>"></div>
-                    <input type="hidden" value="<?=$param['sp'];?>" name="sp">
+                    <input type="hidden" value="<?=htmlspecialchars($param['sp']);?>" name="sp">
                 </div>
                 <div style="float: left;" class="check">
                     <div style="position: relative;">Cooperative</div>
                     <div class="checkbox <?php if($param['coop'] == "1"): ?>ticked<?php endif; ?>"></div>
-                    <input type="hidden" value="<?=$param['coop'];?>" name="coop">
+                    <input type="hidden" value="<?=htmlspecialchars($param['coop']);?>" name="coop">
                 </div>
                 <div style="float: left;" class="check">
                     <div style="position: relative;">World Record</div>
                     <div class="checkbox <?php if($param['wr'] == "1"): ?>ticked<?php endif; ?>"></div>
-                    <input type="hidden" value="<?=$param['wr'];?>" name="wr">
+                    <input type="hidden" value="<?=htmlspecialchars($param['wr']);?>" name="wr">
                 </div>
                 <div style="float: left;" class="check">
                     <div style="position: relative;">Demo</div>
                     <div class="checkbox <?php if($param['demo'] == "1"): ?>ticked<?php endif; ?>"></div>
-                    <input type="hidden" value="<?=$param['demo'];?>" name="demo">
+                    <input type="hidden" value="<?=htmlspecialchars($param['demo']);?>" name="demo">
                 </div>
                 <div style="float: left;" class="check">
                     <div style="position: relative;">Video</div>
                     <div class="checkbox <?php if($param['yt'] == "1"): ?>ticked<?php endif; ?>"></div>
-                    <input type="hidden" value="<?=$param['yt'];?>" name="yt">
+                    <input type="hidden" value="<?=htmlspecialchars($param['yt']);?>" name="yt">
                 </div>
                 <div style="float: left;" class="check">
                     <div style="position: relative;">Submission</div>
                     <div class="checkbox <?php if($param['submission'] == "1"): ?>ticked<?php endif; ?>"></div>
-                    <input type="hidden" value="<?=$param['submission'];?>" name="submission">
+                    <input type="hidden" value="<?=htmlspecialchars($param['submission']);?>" name="submission">
                 </div>
                 <!--                <div style="float: left; display: none" class="number">-->
                 <!--                    <label class="top" style="position: relative;">Max days ago</label>-->
