@@ -654,8 +654,7 @@
     <?php endif; ?>
     <?php else: ?>
         <div class="user-noexist">
-            <div class="stmt">Profile does not exist. This player has no records that are ranked.</div>
-            <!-- <div>If you believe the statement above is incorrect, please contact a site administrator.</div> -->
+            <div class="stmt">Profile not in database! <?=(SteamSignIn::isLoggedIn($user->profileNumber))?'You have to register your profile':'Player has to register his profile'?> by getting into top <?=Leaderboard::numTrackedPlayerRanks?> on any chamber.</div>
         </div>
     <?php endif; ?>
 </div>
@@ -871,14 +870,17 @@
     var profilePermissions = <?=(SteamSignIn::hasProfilePrivileges($user->profileNumber)) ? "true" : "false"?>;
     var currentScoreID = null;
     var bestScore = null;
+    var worldRecord = null;
     var currentMap = null;
     var $scoreMenu = null;
     var $scoreMenuToggleIcon = null;
     var $changeEntries = null;
     var $status = null;
     var entries = null;
+    var worldRecordSubmission = false;
 
     function openScoreMenu(event, map, scoreID) {
+        worldRecordSubmission = false;
         var $target = $(event.target);
 
         if ($target.hasClass("scoreMenuToggle")) {
@@ -917,6 +919,7 @@
     }
 
     function rebuildScoreMenu() {
+        worldRecordSubmission = false;
         $scoreMenu.slideUp("slow");
         $scoreMenu.empty();
 
@@ -944,6 +947,9 @@
     function updateBestScore() {
         var unbannedEntries = entries.filter(function(e) { return e.banned == 0; });
         bestScore = Math.min.apply(Math, unbannedEntries.map(function(o){ return o.score; }));
+
+        var diff = $scoreMenu.parent().find(".wr-diff").html().substr(1);
+        worldRecord = !isNaN(diff) && diff != "" ? bestScore + (diff * -100) : bestScore;
     }
 
     function drawScoreMenu() {
@@ -1075,7 +1081,7 @@
                     "<input type='text' name='score' value='' style='width: 65px;'>" +
                 "</div>" +
                 "<div class='setYoutubeContainer' style='display:inline-block; width: 100%;'>" +
-                    "<label for='youtubeID' style='float: left; color: inherit; margin-top: 3px;'>Youtube URL</label>" +
+                    "<label for='youtubeID' style='float: left; color: inherit; margin-top: 3px;'>YouTube URL</label>" +
                     "<input type='text' name='youtubeID' value='' style='width: 265px;'>" +
                 "</div>" +
                 "<div class='setCommentContainer'  style='display:inline-block; width: 100%;'>" +
@@ -1099,7 +1105,20 @@
         closeAllChangeMenus();
         openSubmissionForm();
 
+        $status.html("");
+
+        $submissionForm.find(".scoreInputContainer input").on('change keyup paste', function() {
+            if (worldRecordSubmission) {
+                this.parentElement.parentElement.querySelector(".addScoreButton").innerHTML = "Submit score";
+                $status.html("");
+                worldRecordSubmission = false;
+            }
+        });
+
+        var isProcessing = false;
         $submissionForm.find(".addScoreButton").click(function() {
+            if (isProcessing) return;
+
             var $youtubeField = $submissionForm.find(".setYoutubeContainer input");
             var $scoreField = $submissionForm.find(".scoreInputContainer input");
             var $commentField = $submissionForm.find(".setCommentContainer input");
@@ -1129,13 +1148,21 @@
             var score = $scoreField.val();
             score = getScoreFromString(score);
             if (isNaN(score) || score == null) {
-                setStatusError("Invalid score.");
+                setStatusError("Invalid time format. Examples: 11.11 or 1:11.11");
                 return;
             }
-            else if (score >= bestScore) {
-                setStatusError("Score too high.");
+            if (score >= bestScore) {
+                setStatusError("Time does not beat your personal best.");
                 return;
             }
+            if (score <= worldRecord && !worldRecordSubmission) {
+                this.innerHTML = "Yes, submit score";
+                setStatusError("This would be World Record! Are you sure?");
+                worldRecordSubmission = true;
+                return;
+            }
+
+            worldRecordSubmission = false;
 
             var comment = $commentField.val();
             if (!validateComment(comment)) {
@@ -1152,6 +1179,7 @@
 
             var formData = new FormData($submissionForm[0]);
             setStatusProcessing();
+            isProcessing = true;
 
             $.ajax({
                 url: '/submitChange',
@@ -1174,6 +1202,9 @@
                             setStatusSuccess("Time submitted.");
                         });
                     });
+                },
+                complete: function() {
+                    isProcessing = false;
                 },
                 cache: false,
                 contentType: false,
@@ -1322,7 +1353,7 @@
                         "<input type='text' name='id' style='display: none' value='" + entry.id + "'>" +
                         "<div>" +
                             "<div class='button deleteSubmission' style='" + ((entry.submission == 0) ? "display:none;" : "") + "'>" +
-                            "Delete Submission" +
+                            "Delete submission" +
                             "</div>" +
                         "</div>" +
                         "<div class='uploadDemoContainer'" + ((entry.hasDemo == 1) ? " style='display:none'" : "") + ">" +
@@ -1343,23 +1374,23 @@
                         "<div class='setYoutubeContainer'" + ((entry.youtubeID != null) ? " style='display:none'" : "") + "'>" +
                             "<input type='text' name='youtubeID' value='" + ((entry.youtubeID != null) ? "www.youtube.com/watch?v="+entry.youtubeID : "") + "'>" +
                             "<div class='button setYoutube' style='margin-left: 3px'>" +
-                                "Set Youtube URL" +
+                                "Set YouTube URL" +
                             "</div>" +
                         "</div>" +
                         "<div>" +
                             "<div class='button deleteYoutube' style='" + ((entry.youtubeID == null) ? "display:none;" : "") + "'>" +
-                                "Remove Youtube URL" +
+                                "Remove YouTube URL" +
                             "</div>" +
                         "</div>" +
                         "<div class='setCommentContainer'" + ((entry.note != null) ? " style='display:none'" : "") + "'>" +
                             "<input type='text' name='comment' value='"+((entry.note != null) ? entry.note : "")+"'>" +
                             "<div class='button setComment' style='margin-left: 3px'>" +
-                                "Set Comment" +
+                                "Set comment" +
                             "</div>" +
                         "</div>" +
                         "<div>" +
                             "<div class='button deleteComment' style='" + ((entry.note == null) ? "display:none;" : "") + "'>" +
-                                "Remove Comment" +
+                                "Remove comment" +
                             "</div>" +
                         "</div>" +
                     "</form>");
@@ -1515,7 +1546,7 @@
 
                             $deleteYoutubeButton.show();
                             $setYoutubeContainer.hide();
-                            setStatusSuccess("Youtube video set.");
+                            setStatusSuccess("YouTube video set.");
                         },
                         cache: false,
                         contentType: false,
@@ -1523,7 +1554,7 @@
                     }, 'json');
                 }
                 else {
-                    setStatusError("Youtube URL can't be empty.");
+                    setStatusError("YouTube URL can't be empty.");
                 }
             });
 
@@ -1552,7 +1583,7 @@
                             $youtubeEmbedScore.hide();
                         }
 
-                        setStatusSuccess("Youtube video removed.");
+                        setStatusSuccess("YouTube video removed.");
                     },
                     cache: false,
                     contentType: false,
@@ -1656,6 +1687,8 @@
     }
 
     function closeSubmissionForm() {
+        worldRecordSubmission = false;
+        $status.html("");
         var $button = $(".createSubmission .button");
         var $submissionForm = $(".submissionForm");
         if ($submissionForm.length > 0) {
