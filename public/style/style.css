@@ -107,7 +107,7 @@ a:hover, a:focus {
     position: absolute;
     display: table;
     margin-right: 45px;
-    min-width: 325px;
+    min-width: 340px;
 }
 #header_right #userinfo{
     top: 20px;
@@ -1008,23 +1008,23 @@ body > #youtube #ytplayer {
     padding-top: 5px;
 }
 #profile .global-stats .block-container.wr {
-    width: 13%;
+    width: 14%;
 }
 #profile .global-stats .block-container.oldnew {
-    width: 19%;
+    width: 20%;
 }
 #profile .global-stats .block-container.oldnew .number {
     font-size:25px;
     vertical-align: top;
 }
 #profile .global-stats .block-container.average {
-    width: 16%;
+    width: 17%;
 }
 #profile .global-stats .block-container.bestworst {
-    width: 16%;
+    width: 17%;
 }
 #profile .global-stats .block-container.ranks {
-    width: 15%;
+    width: 16%;
 }
 #profile .global-stats .block-container.bestworst .title{
     width: 116px;
