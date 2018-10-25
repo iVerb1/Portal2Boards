@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
 @font-face{
     font-family: 'Aperture';
     src: url('/style/din1451alt.eot');
@@ -11,26 +12,26 @@ body {
     width: 100%;
     padding: 0;
     margin: 0;
-    font-family: Segoe UI;
+    font-family: 'Open Sans', sans-serif;
     font-size: 12px;
     min-width: 1115px;
     /*min-width: 1319px;*/
 }
 label {
     display: block;
-    font-family: Segoe UI;
+    font-family: 'Open Sans', sans-serif;
     color: #4b4b4b;
 }
 input, select {
     display: block;
-    font-family: Segoe UI;
+    font-family: 'Open Sans', sans-serif;
     background: #fdfdfd;;
     color: #000;
     font-weight: normal;
 }
 input[type=text] {
     height: 27px;
-    font-family: Segoe UI;
+    font-family: 'Open Sans', sans-serif;
     font-size: 11px;
     border: 1px solid #c2cbd0;
     background: #fdfdfd;;
@@ -136,7 +137,7 @@ a:hover, a:focus {
     margin-top: -7px;
 }
 #navigation .nav_button, #navigation > .nav_dropdown {
-    font-family: Segoe UI;
+    font-family: 'Open Sans', sans-serif;
     font-size: 15px;
     /*font-weight: bold;*/
     /*letter-spacing: -0.5px;*/
@@ -287,7 +288,7 @@ a:hover, a:focus {
 }
 #welcome {
     float: left;
-    font-family: Segoe UI;
+    font-family: 'Open Sans', sans-serif;
     font-size: 12px;
     color: #333;
     text-align: right;
@@ -323,7 +324,7 @@ a:hover, a:focus {
     margin-top: 55px;
     color: #e1e1e1;
     font-size: 20px;
-    font-family: Segoe UI;
+    font-family: 'Open Sans', sans-serif;
     font-weight: bold;
     text-shadow: 0px 0px 3px #000000;
     filter: dropshadow(color=#000000, offx=0, offy=0);
@@ -415,7 +416,7 @@ a:hover, a:focus {
 }
 #chambers .chamber_scores {
     width: 100%;
-    font-family: Segoe UI;
+    font-family: 'Open Sans', sans-serif;
     font-size: 12px;
     /*text-transform: uppercase;*/
     /*font-family: Aperture;*/
@@ -518,7 +519,7 @@ a:hover, a:focus {
     left: 5px;
 }
 #about {
-    font-family: Segoe UI;
+    font-family: 'Open Sans', sans-serif;
     margin: 30px 0px 0px 42px;
 }
 #about .largeTitle {
@@ -593,7 +594,7 @@ a:hover, a:focus {
     margin-top: -56px;
     height: 56px;
     clear: both;
-    font-family: Tahoma, Segoe UI;
+    font-family: Tahoma, 'Open Sans', sans-serif;
     font-size: 11px;
     color: #4c4c4c;
     padding: 0 20px;
@@ -695,7 +696,7 @@ a:hover, a:focus {
     font-weight: bold;
     cursor: pointer;
     font-size: 11px;
-    font-family: Tahoma, Segoe UI;
+    font-family: Tahoma, 'Open Sans', sans-serif;
     color: #7b7b7b;
 }
 #changelog #firstentry, .datatable #firstentry {
@@ -834,7 +835,7 @@ a:hover, a:focus {
     text-align: left;
 }
 #changelog .morris-hover, #profile .morris-hover, #chamber .morris-hover  {
-    font-family: Segoe UI;
+    font-family: 'Open Sans', sans-serif;
     font-size: 12px;
     color: #444;
     padding: 10px;
@@ -843,7 +844,7 @@ a:hover, a:focus {
      white-space: nowrap;
 }
 #profile .morris-hover table, #changelog .morris-hover table   {
-    font-family: Segoe UI;
+    font-family: 'Open Sans', sans-serif;
     font-size: 12px;
     color: inherit;
     white-space: nowrap;
@@ -907,7 +908,7 @@ body > #youtube #ytplayer {
 
 #editProfile {
     margin: 20px 0px 0px 22px;
-    font-family: Segoe UI;
+    font-family: 'Open Sans', sans-serif;
 }
 #editProfile .normalcontent {
     font-size: 12px;
@@ -928,7 +929,7 @@ body > #youtube #ytplayer {
     margin: 30px auto;
     padding: 10px;
     /*overflow: auto;*/
-    /*font-family: Segoe UI, Helvetica, sans-serif;*/
+    /*font-family: 'Open Sans', sans-serif, Helvetica, sans-serif;*/
     box-sizing: content-box;
 }
 #profile .userinformation {
@@ -1677,7 +1678,7 @@ body > #youtube #ytplayer {
 
 #chamber .entry > *  {
     float: left;
-    font-family: Segoe UI;
+    font-family: 'Open Sans', sans-serif;
     color: #4A4A4A;
     font-size: 14px;
     line-height: 42px;
@@ -1823,7 +1824,7 @@ body > #youtube #ytplayer {
     -webkit-user-select: none;
     vertical-align: middle;
     font-size: 13px;
-    font-family: Segoe UI;
+    font-family: 'Open Sans', sans-serif;
     text-transform: none;
     line-height: 24px;
 }

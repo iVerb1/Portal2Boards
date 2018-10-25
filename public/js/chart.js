@@ -166,7 +166,7 @@ function drawActivityChart(activityByDate, beginDate, endDate, $element, resize)
             },
             barColors: ['#2f96d1'],
             hideHover: 'auto',
-            gridTextFamily: "Segoe UI",
+            gridTextFamily: "Open Sans",
             gridTextColor: "#777"
         });
     }
