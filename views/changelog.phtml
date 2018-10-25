@@ -13,7 +13,7 @@
     <div id="filters">
         <div id="filter_instructions_lol">Use these filters to display the changelog you want</div>
         <div id="filter_options">
-            <form name="filters" action="/changelog" method="get">
+            <form name="filters" action="/changelog" method="get" onsubmit="clearEmptyParams(this);">
                 <div style="float: left;" class="input">
                     <label for="nickname">Nickname</label>
                     <input type="text" name="boardName" value="<?=$param['boardName'];?>">
@@ -136,6 +136,15 @@
     <?php endif; ?>
     </div>
 <script>
+    function clearEmptyParams(form) {
+        var inputs = form.querySelectorAll('input,select');
+        var input;
+        for (var i = 0; input = inputs[i]; ++i) {
+            if (input.getAttribute('name') && (!input.value || input.value === "")) {
+                input.setAttribute('name', '');
+            }
+        }
+    }
 
     $(document).ready(function() {
 
