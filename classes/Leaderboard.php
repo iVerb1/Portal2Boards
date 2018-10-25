@@ -651,19 +651,26 @@ class Leaderboard
     }
 
     //TODO: remove limitation on characters used in parameters
-    //TODO: replace day amount with date range
-    //TODO: allow for fetching scores of banned players
-    //TODO: clean up ugly where clauses
     public static function getChangelog($parameters = array())
     {
-        $param = array("chamber" => "" , "chapter" => ""
-        , "boardName" => "" , "profileNumber" => ""
-        , "type" => "" , "sp" => "1", "coop" => "1"
+        $param = array(
+        "chamber" => ""
+        , "chapter" => ""
+        , "boardName" => ""
+        , "profileNumber" => ""
+        , "type" => ""
         , "wr" => ""
+        , "postRank" => ""
+        , "preRank" => ""
+        , "dateStart" => ""
+        , "dateEnd" => ""
         , "banned" => ""
-        , "demo" => "", "yt" => ""
+        , "wos" => ""
+        , "demo" => ""
+        , "yt" => ""
         , "submission" => ""
-        , "maxDaysAgo" => "", "hasDate" => ""
+        , "maxDaysAgo" => ""
+        , "hasDate" => ""
         , "id" => "");
 
         foreach ($parameters as $key => $val) {
@@ -672,22 +679,34 @@ class Leaderboard
                 $param[$key] = Database::getMysqli()->real_escape_string($result);
             }
         }
-        $whereClause = "";
+
+        $whereTimeGained = "";
         if ($param['maxDaysAgo'] != "") {
-            $whereClause = "time_gained > DATE_SUB(NOW(), INTERVAL ".$param['maxDaysAgo']." DAY) AND ";
-        }
-        
-        if ($param['yt'] != "") {
-            if ($param['yt'] == "1")
-                $whereClause1 = "youtube_id IS NOT NULL AND";
-            if ($param['yt'] == "0")
-                $whereClause1 = "youtube_id IS NULL AND";
+            $whereTimeGained = "time_gained > DATE_SUB(NOW(), INTERVAL ".$param['maxDaysAgo']." DAY) AND ";
         }
 
-        $whereClause2 = ($param["hasDate"] == "1") ? "time_gained IS NOT NULL AND " : "";
-        $whereClause3 = ($param["wr"] != "") ? "wr_gain = '{$param["wr"]}' AND " : "";
-        $whereClause4 = ($param["banned"] != "") ? "banned = '{$param["banned"]}' AND " : "";
-        $whereClause5 = ($param["id"] != "") ? "id = '{$param["id"]}' AND " : "";
+        if ($param['dateStart'] != "") {
+            $whereDateStart = "time_gained >= '".date('Y-m-d', strtotime($param['dateStart']))."' AND ";
+        }
+        if ($param['dateEnd'] != "") {
+            $whereDateEnd = "time_gained < '".date('Y-m-d', strtotime($param['dateEnd']))."' AND ";
+        }
+
+        if ($param['yt'] != "") {
+            if ($param['yt'] == "1")
+                $whereYouTubeId = "youtube_id IS NOT NULL AND";
+            if ($param['yt'] == "0")
+                $whereYouTubeId = "youtube_id IS NULL AND";
+        }
+
+        $whereHasDate = ($param["hasDate"] != "" && $param["hasDate"] == 0) ? "time_gained IS NULL AND " : "time_gained IS NOT NULL AND ";
+        $whereWr = ($param["wr"] != "") ? "wr_gain = '{$param["wr"]}' AND " : "";
+        $whereBanned = ($param["banned"] != "") ? "banned = '{$param["banned"]}' AND " : "";
+        $whereId = ($param["id"] != "") ? "id = '{$param["id"]}' AND " : "";
+        $wherePostRank = ($param["postRank"] != "") ? "post_rank = '{$param["postRank"]}' AND " : "";
+        $wherePreRank = ($param["preRank"] != "") ? "pre_rank = '{$param["preRank"]}' AND " : "";
+
+        $isOnWallOfShame= ($param['wos'] == "1") ? 1 : 0;
 
         $changelog_data = Database::query("SELECT IFNULL(usersnew.boardname, usersnew.steamname) AS player_name, usersnew.avatar, ch.profile_number,
                                             ch.score, ch.id, ch.pre_rank, ch.post_rank, ch.wr_gain, ch.time_gained, ch.has_demo as hasDemo, ch.youtube_id as youtubeID, ch.note,
@@ -697,7 +716,16 @@ class Leaderboard
 												FROM (
                                                     SELECT *
                                                     FROM changelog
-                                                    WHERE " . $whereClause . " " . $whereClause1 . " " . $whereClause2 . " " . $whereClause3 . " " . $whereClause4 . " " . $whereClause5 . "
+                                                    WHERE " . $whereTimeGained . " "
+                                                            . $whereYouTubeId . " "
+                                                            . $whereHasDate . " "
+                                                            . $whereWr . " "
+                                                            . $whereBanned . " "
+                                                            . $whereId . " "
+                                                            . $wherePostRank . " "
+                                                            . $wherePreRank . " "
+                                                            . $whereDateStart . " "
+                                                            . $whereDateEnd . "
                                                     map_id LIKE '%{$param['chamber']}%' 
                                                     AND id != 69015
                                                     AND profile_number LIKE '%{$param['profileNumber']}%'
@@ -709,7 +737,7 @@ class Leaderboard
                                                 INNER JOIN usersnew ON ch.profile_number = usersnew.profile_number
 												INNER JOIN maps ON ch.map_id = maps.steam_id
 												INNER JOIN chapters ON maps.chapter_id = chapters.id
-												WHERE  usersnew.banned = 0
+												WHERE  usersnew.banned = '{$isOnWallOfShame}'
 												AND maps.is_coop LIKE '%{$param['type']}%'
                                                 AND chapters.id LIKE '%{$param['chapter']}%'
                                                 AND IFNULL(usersnew.boardname, usersnew.steamname) LIKE '%{$param['boardName']}%'
