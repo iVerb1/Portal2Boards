@@ -24,7 +24,7 @@
                 <?php $grammar = ($boardData["portals"] != 1) ? "Portals" : "Portal"; ?>
 				<div class="chamber leastportals">
                 <div class="chamberimage"
-                    <?=($mapData["isPublic"]) ? 'onclick="goToSteamPage(event, '.$steamIdTime.')"' : ''?>
+                    <?=($mapData["isPublic"]) ? 'onclick="goToSteamPage(event, '.$steamId.')"' : ''?>
                     style="background: url('/images/chambers/<?=$steamIdTime;?>.jpg'); <?=($mapData["isPublic"]) ? '' : 'cursor: default'?>">
 					<div class="chambertitle">
 						<div class="titlebghelper"></div>
