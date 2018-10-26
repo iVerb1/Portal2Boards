@@ -1143,12 +1143,12 @@ class Leaderboard
             INNER JOIN (
                 SELECT *
                 FROM changelog
-                WHERE changelog.id = '{$id}'
+                WHERE changelog.id = '{$id}' AND changelog.submission = '1'
             ) as ch2 on ch1.previous_id = ch2.id
             SET ch1.previous_id = ch2.previous_id");
 
         $change = self::getChange($id);
-        Database::query("DELETE FROM changelog where id = '{$id}'");
+        Database::query("DELETE FROM changelog where id = '{$id}' AND submission = '1'");
         self::resolveScore($change["profile_number"], $change["mapid"]);
     }
 
