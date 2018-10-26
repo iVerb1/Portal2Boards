@@ -1054,11 +1054,9 @@ class Leaderboard
         }
     }
 
-    public static function setScoreBanStatus($changelogId, $banned, $comment = "Automatic Ban")
+    public static function setScoreBanStatus($changelogId, $banned, $comment)
     {
-        $note = !$banned
-            ? Database::getMysqli()->real_escape_string($comment)
-            : "NULL";
+        $note = Database::getMysqli()->real_escape_string($comment);
         Database::query("UPDATE changelog SET banned = '{$banned}', note = '{$note}' WHERE id = '{$changelogId}'");
 
         $data = Database::query("SELECT profile_number, map_id FROM changelog WHERE id = '{$changelogId}'");

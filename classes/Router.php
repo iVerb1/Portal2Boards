@@ -273,12 +273,14 @@ class Router {
         if ($location[1] == "setScoreBanStatus") {
             if (isset($_POST["id"]) && isset($_POST["banStatus"])) {
 
-                if (!is_numeric($_POST["id"])) {
+                if (!is_numeric($_POST["id"]) || !is_numeric($_POST["banStatus"])) {
                     exit;
                 }
 
                 if (SteamSignIn::loggedInUserIsAdmin()) {
-                    $comment = "Banned by {$SteamSignIn::$loggedInUser->userData->steamname}";
+                    $comment = $_POST["banStatus"] == 1
+                        ? "Banned by {$SteamSignIn::$loggedInUser->userData->steamname}"
+                        : "";
                     Leaderboard::setScoreBanStatus($_POST["id"], $_POST["banStatus"], $comment);
                 }
             }
