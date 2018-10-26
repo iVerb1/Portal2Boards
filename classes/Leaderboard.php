@@ -1018,6 +1018,7 @@ class Leaderboard
     public static function setYoutubeID($changelogId, $youtubeID)
     {
         if ($youtubeID != null && $youtubeID != "") {
+            $youtubeID = Database::getMysqli()->real_escape_string($youtubeID);
             Database::query("UPDATE changelog
                         SET youtube_id = '{$youtubeID}'
                         WHERE changelog.id = '{$changelogId}'");
