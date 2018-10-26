@@ -278,7 +278,8 @@ class Router {
                 }
 
                 if (SteamSignIn::loggedInUserIsAdmin()) {
-                    Leaderboard::setScoreBanStatus($_POST["id"], $_POST["banStatus"]);
+                    $comment = "Banned by {$SteamSignIn::$loggedInUser->userData->steamname}";
+                    Leaderboard::setScoreBanStatus($_POST["id"], $_POST["banStatus"], $comment);
                 }
             }
             else {
