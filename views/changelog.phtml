@@ -97,7 +97,7 @@
         <div style="font-size: 20px; margin: auto; width: 100%; text-align: center; color: #888;">
             <i class="fa fa-times" style="padding-right: 10px"></i>No scores found
         </div>
-    <?php elseif (count($activity) > 0): ?>
+    <?php elseif (count($view->changelog) > 0): ?>
         <div class = 'activity'>
             <div id= 'changelogActivity' style= 'height: 175px;'>
                 <i class="fa fa-circle-o-notch fa-spin fa-fw loading"></i>
@@ -148,44 +148,20 @@
 
     $(document).ready(function() {
 
-        // $(".rank").each(function() {
-        //     //pointsOnHover($(this), $(this).text());
-
-        //     if ($(this).find("i").length) {
-        //         rank = 1;
-        //     }
-        //     else {
-        //         rank = parseInt($(this).text());
-        //     }
-
-        //     var points = Math.max(1,  Math.pow(200 - (rank - 1), 2) / 200);
-        //     points = Math.round(points * 10) / 10;
-
-        //     if (!isNaN(rank)) {
-
-        //         var title;
-        //         if (points == 1)
-        //             title = points + " point";
-        //         else
-        //             title = points + " points";
-
-        //         $(this).tooltip({
-        //             trigger: 'manual',
-        //             placement: 'top',
-        //             title: title
-        //         });
-
-        //         $(this).hover(function() {
-        //             $(this).tooltip('show');
-        //         }, function() {
-        //             $(this).tooltip('hide');
-        //         });
-        //     }
-        // });
-
         $(".entry").each(function() {
-            
+
             var $entry = $(this);
+
+        <?php if(SteamSignIn::loggedInUserIsAdmin()): ?>
+            var $date = $entry.find(".date .dateTime");
+            $date.tooltip({trigger: 'manual', title: "ID " + this.id });
+            $date.hover(function() {
+                $(this).tooltip('show');
+            }, function() {
+                $(this).tooltip('hide');
+            });
+        <?php endif; ?>
+
             var $preRank = $entry.find(".previousscore .rank");
             var $postRank = $entry.find(".newscore .rank");
             var $rankDiff = $entry.find(".rankImprovement")
@@ -199,10 +175,11 @@
             var prePoints = getPointsFromRank(preRank);
             var postPoints = getPointsFromRank(postRank)
             var pointDiff = (postPoints - prePoints);
+            var hasGained = pointDiff > 0;
 
             if (!isNaN(pointDiff) && pointDiff != 0) {
-                pointDiff = Math.round(pointDiff * 10) / 10;
-                var title = "gained " + pointDiff + " " + (pointDiff == 1 ?  + "point" : "points");
+                pointDiff = Math.abs(Math.round(pointDiff * 10) / 10);
+                var title = (hasGained ? "gained " : "lost ") + pointDiff + " " + (pointDiff == 1 ?  + "point" : "points");
                 $rankDiff.tooltip({trigger: 'manual', title: title });
                 $rankDiff.hover(function() {
                     $(this).tooltip('show');
@@ -257,9 +234,13 @@
         });
 
         var activityByScore = getActivityByScore(<?=json_encode($activity)?>);
+        var activityChart = $("#changelogActivity");
         if (Object.keys(activityByScore).length > 0) {
             var activityByDate = getActivityByDate(activityByScore);
-            drawActivityChart(activityByDate, localizeDate(getDateFirstChange(activityByDate)), getCurrentLocalDate(), $("#changelogActivity"));
+            drawActivityChart(activityByDate, localizeDate(getDateFirstChange(activityByDate)), getCurrentLocalDate(), activityChart);
+        } else {
+            activityChart.hide();
+            document.querySelector('#filters').style.marginBottom = "60px";
         }
     });
 
