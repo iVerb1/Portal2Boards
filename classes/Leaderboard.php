@@ -477,8 +477,8 @@ class Leaderboard
                 : "NULL";
 
             Debug::log("Inserting change. Player: ".$change["profileNumber"]." Map: ".$change["mapId"]." Score: ".$change["score"]);
-            Database::query("INSERT INTO changelog(id, profile_number, score, map_id, wr_gain, previous_id, pre_rank)
-              VALUES (NULL, '" . $change["profileNumber"] . "','" . $change["score"] . "','" . $change["mapId"] . "','" . $wr . "', ". $previousId .", ".$preRank.")
+            Database::query("INSERT INTO changelog(id, profile_number, score, map_id, previous_id, pre_rank)
+              VALUES (NULL, '" . $change["profileNumber"] . "','" . $change["score"] . "','" . $change["mapId"] . "', ". $previousId .", ".$preRank.")
             ");
 
             $id = Database::getMysqli()->insert_id;
@@ -700,7 +700,7 @@ class Leaderboard
         }
 
         $whereHasDate = ($param["hasDate"] != "" && $param["hasDate"] == 0) ? "time_gained IS NULL AND " : "time_gained IS NOT NULL AND ";
-        $whereWr = ($param["wr"] != "") ? "wr_gain = '{$param["wr"]}' AND " : "";
+        $whereWr = ($param["wr"] != "" && $param["wr"] == 1) ? "post_rank = '1' AND " : "";
         $whereBanned = ($param["banned"] != "") ? "banned = '{$param["banned"]}' AND " : "";
         $whereId = ($param["id"] != "") ? "id = '{$param["id"]}' AND " : "";
         $wherePostRank = ($param["postRank"] != "") ? "post_rank = '{$param["postRank"]}' AND " : "";
@@ -709,7 +709,7 @@ class Leaderboard
         $isOnWallOfShame= ($param['wos'] == "1") ? 1 : 0;
 
         $changelog_data = Database::query("SELECT IFNULL(usersnew.boardname, usersnew.steamname) AS player_name, usersnew.avatar, ch.profile_number,
-                                            ch.score, ch.id, ch.pre_rank, ch.post_rank, ch.wr_gain, ch.time_gained, ch.has_demo as hasDemo, ch.youtube_id as youtubeID, ch.note,
+                                            ch.score, ch.id, ch.pre_rank, ch.post_rank, ch.time_gained, ch.has_demo as hasDemo, ch.youtube_id as youtubeID, ch.note,
                                             ch.banned, ch.submission,
                                             ch_previous.score as previous_score,
                                             maps.name as chamberName, chapters.id as chapterId, maps.steam_id AS mapid
@@ -756,6 +756,7 @@ class Leaderboard
             $row["pre_points"] = null;
             $row["post_point"] = null;
             $row["point_improvement"] = null;
+            $row["wr_gain"] = $row["post_rank"] == 1 ? 1 : 0;
 
             if ($row["previous_score"] != NULL) {
                 $row["improvement"] = ($row["previous_score"] - $row["score"]);
@@ -1156,8 +1157,8 @@ class Leaderboard
             ? $oldChamberBoard[$profileNumber]["scoreData"]["changelogId"]
             : "NULL";
 
-        Database::query("INSERT INTO changelog(id, profile_number, score, map_id, wr_gain, previous_id, pre_rank, submission, note)
-              VALUES (NULL, '" . $profileNumber . "','" . $score . "','" . $chamber . "','" . $wr . "', ". $previousId .", ".$preRank.", 1, '".$comment."')
+        Database::query("INSERT INTO changelog(id, profile_number, score, map_id, previous_id, pre_rank, submission, note)
+              VALUES (NULL, '" . $profileNumber . "','" . $score . "','" . $chamber . "', ". $previousId .", ".$preRank.", 1, '".$comment."')
             ");
 
         $id = Database::getMysqli()->insert_id;
