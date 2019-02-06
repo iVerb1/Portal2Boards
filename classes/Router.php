@@ -726,6 +726,7 @@ class Router {
             , "wr" => ""
             , "postRank" => ""
             , "preRank" => ""
+            , "top" => ""
             , "dateStart" => ""
             , "dateEnd" => ""
             , "demo" => ""

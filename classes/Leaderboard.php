@@ -662,6 +662,7 @@ class Leaderboard
         , "wr" => ""
         , "postRank" => ""
         , "preRank" => ""
+        , "top" => ""
         , "dateStart" => ""
         , "dateEnd" => ""
         , "banned" => ""
@@ -705,6 +706,7 @@ class Leaderboard
         $whereId = ($param["id"] != "") ? "id = '{$param["id"]}' AND " : "";
         $wherePostRank = ($param["postRank"] != "") ? "post_rank = '{$param["postRank"]}' AND " : "";
         $wherePreRank = ($param["preRank"] != "") ? "pre_rank = '{$param["preRank"]}' AND " : "";
+        $whereTopRank = ($param["top"] != "") ? "post_rank <= '{$param["top"]}' AND " : "";
 
         $isOnWallOfShame= ($param['wos'] == "1") ? 1 : 0;
 
@@ -724,6 +726,7 @@ class Leaderboard
                                                             . $whereId . " "
                                                             . $wherePostRank . " "
                                                             . $wherePreRank . " "
+                                                            . $whereTopRank . " "
                                                             . $whereDateStart . " "
                                                             . $whereDateEnd . "
                                                     map_id LIKE '%{$param['chamber']}%' 
