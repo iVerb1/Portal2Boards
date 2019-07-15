@@ -326,6 +326,7 @@ class User {
     }
 
     public function getChamberData($board) {
+        $maps = Cache::get("maps");
         $times = NULL;
         $times["numWRs"] = 0;
         $times["rankSum"] = 0;
@@ -349,29 +350,36 @@ class User {
                         $times["numYoutubeVideos"]++;
                     }
 
-                    $times["rankSum"] += $scoreData["playerRank"];
-                    $times["mapCount"]++;
+                    if (!$maps["maps"][$map]["is_frozen"]) {
+                        $times["rankSum"] += $scoreData["playerRank"];
+                        $times["mapCount"]++;
 
-                    if ($times["worstRank"] == NULL) {
-                        $times["bestRank"]["scoreData"] = $scoreData;
-                        $times["worstRank"]["scoreData"] = $scoreData;
-                        $times["bestRank"]["map"] = $map;
-                        $times["worstRank"]["map"] = $map;
-                    }
-                    else {
-                        if ($times["worstRank"]["scoreData"]["playerRank"] == $scoreData["playerRank"]) {
-                            $times["worstRank"]["map"] = "several chambers";
+                        $entryKeys = array_keys($mapData);
+                        if ($mapData[$entryKeys[0]]["scoreData"]["score"] == $scoreData["score"]) {
+                            $times["numWRs"]++;
                         }
-                        if ($times["bestRank"]["scoreData"]["playerRank"] == $scoreData["playerRank"]) {
-                            $times["bestRank"]["map"] = "several chambers";
-                        }
-                        if ($times["worstRank"]["scoreData"]["playerRank"] < $scoreData["playerRank"]) {
+
+                        if ($times["worstRank"] == NULL) {
+                            $times["bestRank"]["scoreData"] = $scoreData;
                             $times["worstRank"]["scoreData"] = $scoreData;
+                            $times["bestRank"]["map"] = $map;
                             $times["worstRank"]["map"] = $map;
                         }
-                        if ($times["bestRank"]["scoreData"]["playerRank"] > $scoreData["playerRank"]) {
-                            $times["bestRank"]["scoreData"] = $scoreData;
-                            $times["bestRank"]["map"] = $map;
+                        else {
+                            if ($times["worstRank"]["scoreData"]["playerRank"] == $scoreData["playerRank"]) {
+                                $times["worstRank"]["map"] = "several chambers";
+                            }
+                            if ($times["bestRank"]["scoreData"]["playerRank"] == $scoreData["playerRank"]) {
+                                $times["bestRank"]["map"] = "several chambers";
+                            }
+                            if ($times["worstRank"]["scoreData"]["playerRank"] < $scoreData["playerRank"]) {
+                                $times["worstRank"]["scoreData"] = $scoreData;
+                                $times["worstRank"]["map"] = $map;
+                            }
+                            if ($times["bestRank"]["scoreData"]["playerRank"] > $scoreData["playerRank"]) {
+                                $times["bestRank"]["scoreData"] = $scoreData;
+                                $times["bestRank"]["map"] = $map;
+                            }
                         }
                     }
 
@@ -391,11 +399,6 @@ class User {
                                 $times["newestScore"]["map"] = $map;
                             }
                         }
-                    }
-
-                    $entryKeys = array_keys($mapData);
-                    if ($mapData[$entryKeys[0]]["scoreData"]["score"] == $scoreData["score"]) {
-                        $times["numWRs"]++;
                     }
 
                     $times["chamber"][$chapter][$map]["WRDiff"] = $this->getWRDiff($mapData);

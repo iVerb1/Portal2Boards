@@ -22,6 +22,9 @@
                 <?php $mapData = $view->board[$chapter][$map] ?>
                 <?php $mapName = $mapInfo["maps"][$map]["mapName"]?>
                 <?php $isPublic =  $mapInfo["maps"][$map]["isPublic"]?>
+                <?php if ($mapInfo["maps"][$map]["is_glitched"]) {
+                    continue;
+                }?>
                 <div class="chamber">
                     <div class="chamberimage" onclick="goToChamber(event, <?=$map;?>)" style="background: url('/images/chambers/<?=$map;?>.jpg'); background-size: cover">
                         <div class="chambertitle">
@@ -29,8 +32,8 @@
                             <div class="titlebg"><a href="/chamber/<?=$map;?>"><?=$mapName?></a></div>
                         </div>
                         <div class="chamber_icons_left">
-                            <?php if($isPublic == "1"): ?>
-                                <a href="<?php echo "http://steamcommunity.com/stats/Portal2/leaderboards/".$map;?>" class="icons" target="_blank">
+                            <?php if($isPublic > 0): ?>
+                                <a href="<?php echo "https://steamcommunity.com/stats/Portal2/leaderboards/".$map;?>" class="icons" target="_blank">
                                      <span class="icons steamLink fa-stack">
                                           <i class="fa fa-square fa-stack-2x"></i>
                                           <i class="fa fa-steam-square fa-stack-2x"></i>

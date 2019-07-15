@@ -1758,6 +1758,11 @@ body > #youtube #ytplayer {
     bottom: 10px;
     left: 10px;
 }
+#chamber .controls.topright.below {
+    position: absolute;
+    top: 41px;
+    right: 10px;
+}
 #chamber .controls.topright {
     position: absolute;
     top: 10px;

@@ -127,7 +127,7 @@ class Leaderboard
     //TODO: generalize map list to id's instead of steam time id's
     public static function getMaps()
     {
-        $data = Database::query("SELECT maps.id, steam_id, is_coop, name, chapter_id, chapters.chapter_name, is_public, lp_id
+        $data = Database::query("SELECT maps.id, steam_id, is_coop, name, chapter_id, chapters.chapter_name, is_public, lp_id, is_frozen, is_glitched, rel_id
                             FROM maps
                             INNER JOIN chapters ON maps.chapter_id = chapters.id
                             ORDER BY  is_coop, maps.id");
@@ -146,6 +146,9 @@ class Leaderboard
             $maps["maps"][$row["steam_id"]]["isPublic"] = $row["is_public"];
             $maps["maps"][$row["steam_id"]]["mapName"] = $row["name"];
             $maps["maps"][$row["steam_id"]]["chapterId"] = $row["chapter_id"];
+            $maps["maps"][$row["steam_id"]]["is_frozen"] = $row["is_frozen"];
+            $maps["maps"][$row["steam_id"]]["is_glitched"] = $row["is_glitched"];
+            $maps["maps"][$row["steam_id"]]["rel_id"] = $row["rel_id"];
 
             if ($row["lp_id"] != NULL) {
                 $maps["lpMaps"][$row["lp_id"]] = $row["steam_id"];
@@ -769,8 +772,13 @@ class Leaderboard
 
     public static function makeChamberPointBoard($board)
     {
+        $maps = Cache::get("maps");
         foreach ($board as $chapter => $chapterData) {
             foreach ($chapterData as $map => $mapData) {
+                if ($maps["maps"][$map]["is_frozen"]) {
+                    continue;
+                }
+
                 foreach ($mapData as $user => $userScoreData) {
                     $pointBoard[$chapter][$map][$user]["userData"] = $userScoreData["userData"];
 
