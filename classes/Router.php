@@ -716,17 +716,27 @@ class Router {
     private function prepareChangelogParams($params)
     {
         $result = array(
-        "chamber" => ""
-        , "chapter" => ""
-        , "boardName" => "" 
-        , "profileNumber" => ""
-        , "type" => "" , "sp" => "1", "coop" => "1"
-        , "wr" => ""
-        , "demo" => ""
-        , "yt" => ""
-        , "maxDaysAgo" => ""
-        , "submission" => ""
-        , "banned" => "");
+            "chamber" => ""
+            , "chapter" => ""
+            , "boardName" => "" 
+            , "profileNumber" => ""
+            , "type" => ""
+            , "sp" => ""
+            , "coop" => ""
+            , "wr" => ""
+            , "postRank" => ""
+            , "preRank" => ""
+            , "top" => ""
+            , "dateStart" => ""
+            , "dateEnd" => ""
+            , "demo" => ""
+            , "yt" => ""
+            , "maxDaysAgo" => ""
+            , "submission" => ""
+            , "banned" => ""
+            , "wos" => ""
+            , "id" => ""
+            , "hasDate" => "");
 
         $changelog_post = array();
         foreach ($params as $key => $val) {
