@@ -1212,7 +1212,7 @@ class Leaderboard
     public static function getLeastPortalsBoard($mode)
     {
 
-        $data = Database::query("SELECT lp.steam_id, lp.portals, chapters.id as chapterId
+        $data = Database::query("SELECT lp.steam_id, lp.portals, chapters.id as chapterId, lp.youtube_id
 								FROM leastportals AS lp
 								INNER JOIN maps ON lp.steam_id = maps.steam_id OR lp.steam_id = maps.lp_id
 								INNER JOIN chapters ON maps.chapter_id = chapters.id
