@@ -46,7 +46,7 @@ class Discord {
                 'text' => 'board.iverb.me'
             ],
             'image' => [
-                'url' => 'https://board.iverb.me/images/chambers_full/'.$data['map_id'].'.jpg'
+                'url' => 'https://raw.githubusercontent.com/iVerb1/Portal2Boards/master/public/images/chambers_full/'.$data['map_id'].'.jpg'
             ],
             'author' => [
                 'name' => $data['player'],
