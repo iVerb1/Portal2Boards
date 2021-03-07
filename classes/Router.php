@@ -273,7 +273,7 @@ class Router {
         if ($location[1] == "setScoreBanStatus") {
             if (isset($_POST["id"]) && isset($_POST["banStatus"])) {
 
-                if (!is_numeric($_POST["id"])) {
+                if (!is_numeric($_POST["id"]) || !is_numeric($_POST["banStatus"])) {
                     exit;
                 }
 
@@ -303,6 +303,10 @@ class Router {
                 }
 
                 if (!preg_match("/^[A-Za-z0-9_\\-?=]*$/", $_POST["youtubeID"])) {
+                    exit;
+                }
+
+                if (strlen($_POST["comment"]) > 100) {
                     exit;
                 }
 
@@ -459,16 +463,18 @@ class Router {
         if ($location[1] == "setProfileBanStatus") {
             if (isset($_POST["profileNumber"]) && isset($_POST["banStatus"])) {
 
-                $profileNumber = $_POST["profileNumber"];
-
                 if (!SteamSignIn::loggedInUserIsAdmin()) {
                     exit;
                 }
 
-                if (!is_numeric($profileNumber)) {
+                if (!is_numeric($_POST["profileNumber"]) || !is_numeric($_POST["banStatus"])) {
                     exit;
                 }
-              
+
+                if (SteamSignIn::isLoggedIn($_POST["profileNumber"])) {
+                    exit;
+                }
+
                 Leaderboard::setProfileBanStatus($_POST["profileNumber"], $_POST["banStatus"]);
             }
             else {

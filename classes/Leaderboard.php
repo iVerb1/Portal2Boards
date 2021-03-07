@@ -1035,6 +1035,7 @@ class Leaderboard
     public static function setYoutubeID($changelogId, $youtubeID)
     {
         if ($youtubeID != null && $youtubeID != "") {
+            $youtubeID = Database::getMysqli()->real_escape_string($youtubeID);
             Database::query("UPDATE changelog
                         SET youtube_id = '{$youtubeID}'
                         WHERE changelog.id = '{$changelogId}'");
@@ -1181,12 +1182,12 @@ class Leaderboard
             INNER JOIN (
                 SELECT *
                 FROM changelog
-                WHERE changelog.id = '{$id}'
+                WHERE changelog.id = '{$id}' AND changelog.submission = '1'
             ) as ch2 on ch1.previous_id = ch2.id
             SET ch1.previous_id = ch2.previous_id");
 
         $change = self::getChange($id);
-        Database::query("DELETE FROM changelog where id = '{$id}'");
+        Database::query("DELETE FROM changelog where id = '{$id}' AND submission = '1'");
         self::resolveScore($change["profile_number"], $change["mapid"]);
     }
 
@@ -1199,7 +1200,7 @@ class Leaderboard
 
     public static function setComment($id, $comment)
     {
-        if ($comment != null && $comment != "") {
+        if ($comment != null && $comment != "" && strlen($comment) <= 100) {
             $comment = Database::getMysqli()->real_escape_string($comment);
             print_r($comment);
             print_r($id);
