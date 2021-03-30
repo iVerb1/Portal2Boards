@@ -600,9 +600,17 @@ class Router {
                 $view->board = Leaderboard::getLeastPortalsBoard(0);
                 View::$pageData["pageTitle"] = "Least Portals - Single Player";
             }
-            if ($location[2] == "coop") {
+            else if ($location[2] == "coop") {
                 $view->board = Leaderboard::getLeastPortalsBoard(1);
                 View::$pageData["pageTitle"] = "Least Portals - Cooperative";
+			}
+            else {
+                $this->routeTo404();
+            }
+
+            if (isset($location[3]) && $location[3] == "json") {
+                echo json_encode($view->board);
+                exit;
             }
         }
 
