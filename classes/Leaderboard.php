@@ -4,6 +4,7 @@ class Leaderboard
 
     const numTrackedPlayerRanks = 200;
     const proofBonusPointsPercentage = 0;
+    const rankForDiscordUpdate = 1;
 
 
     public static function fetchNewData($chamber = "")
@@ -461,13 +462,8 @@ class Leaderboard
             $chapter = $maps["maps"][$change["mapId"]]["chapterId"];
             $mapData = $oldBoards[$chapter][$change["mapId"]];
 
-            $wr = 0;
-            $diff = 0;
-            $keys = array_keys($mapData);
-            if ($change["score"] <= $mapData[$keys[0]]["scoreData"]["score"]) {
-                $wr = 1;
-                $diff = abs($change["score"] - $mapData[$keys[0]]["scoreData"]["score"]);
-            }
+            $banned = $change["score"] < 0 ? 1 : 0;
+            $comment = $banned ? "Automatic Ban" : "NULL";
 
             $previousId = isset($oldBoards[$chapter][$change["mapId"]][$change["profileNumber"]])
                 ? $oldBoards[$chapter][$change["mapId"]][$change["profileNumber"]]["scoreData"]["changelogId"]
@@ -477,12 +473,19 @@ class Leaderboard
                 : "NULL";
 
             Debug::log("Inserting change. Player: ".$change["profileNumber"]." Map: ".$change["mapId"]." Score: ".$change["score"]);
-            Database::query("INSERT INTO changelog(id, profile_number, score, map_id, wr_gain, previous_id, pre_rank)
-              VALUES (NULL, '" . $change["profileNumber"] . "','" . $change["score"] . "','" . $change["mapId"] . "','" . $wr . "', ". $previousId .", ".$preRank.")
-            ");
+            Database::query("INSERT
+                INTO changelog(id, profile_number, score, map_id, banned, previous_id, pre_rank, note)
+                VALUES(
+                    NULL,'"
+                    .$change["profileNumber"]."','"
+                    .$change["score"]."','"
+                    .$change["mapId"]."','"
+                    .$banned."',"
+                    .$previousId.","
+                    .$preRank.","
+                    .$comment.")");
 
             $id = Database::getMysqli()->insert_id;
-            $changes[$id] = $change;
 
             Database::query("INSERT IGNORE INTO scores(profile_number, map_id, changelog_id)
               VALUES ('" . $change["profileNumber"] . "','" . $change["mapId"] . "', ".$id.")
@@ -492,8 +495,30 @@ class Leaderboard
               SET changelog_id = ".$id."
               WHERE profile_number = ". $change["profileNumber"] . " AND map_id = " . $change["mapId"]);
 
-            if ($wr) {
+            if (!$banned) {
+                $changes[$id] = $change;
+            }
+
+            $updates++;
+        }
+
+        $newBoards = self::getBoard();
+        foreach ($changes as $id => $change) {
+            $chapter = $maps["maps"][$change["mapId"]]["chapterId"];
+            $mapData = $newBoards[$chapter][$change["mapId"]];
+            $postRank = isset($newBoards[$chapter][$change["mapId"]][$change["profileNumber"]])
+                ? $newBoards[$chapter][$change["mapId"]][$change["profileNumber"]]["scoreData"]["playerRank"]
+                : "NULL";
+            $wr = $postRank == "1" ? "1" : "0";
+
+            Debug::log("Updating rank of new changelog entry. Player: ".$change["profileNumber"]." Map: ".$change["mapId"]." Score: ".$change["score"]." Rank: ".$postRank);
+            Database::query("UPDATE changelog SET post_rank = ".$postRank.", wr_gain = ".$wr." WHERE id = ". $id);
+
+            if ($postRank != "NULL" && $postRank <= Leaderboard::rankForDiscordUpdate) {
                 $user = new User($change["profileNumber"]);
+                $curWr = $mapData[array_keys($mapData)[0]]["scoreData"]["score"];
+                $wrDiff = abs($change["score"] - $curWr);
+
                 $data = [
                     'id' => $id,
                     'timestamp' => new DateTime(),
@@ -503,22 +528,10 @@ class Leaderboard
                     'player_avatar' => $user->userData->avatar,
                     'map' => $maps["maps"][$change["mapId"]]["mapName"],
                     'score' => Util::formatScoreTime($change["score"]),
-                    'wr_diff' => Util::formatScoreTime($diff)
+                    'wr_diff' => Util::formatScoreTime($wrDiff)
                 ];
                 Discord::sendWebhook($data);
             }
-            $updates++;
-        }
-
-        $newBoards = self::getBoard();
-        foreach ($changes as $id => $change) {
-            $chapter = $maps["maps"][$change["mapId"]]["chapterId"];
-            $postRank = isset($newBoards[$chapter][$change["mapId"]][$change["profileNumber"]])
-                ? $newBoards[$chapter][$change["mapId"]][$change["profileNumber"]]["scoreData"]["playerRank"]
-                : "NULL";
-
-            Debug::log("Updating rank of new changelog entry. Player: ".$change["profileNumber"]." Map: ".$change["mapId"]." Score: ".$change["score"]." Rank: ".$postRank);
-            Database::query("UPDATE changelog SET post_rank = ".$postRank." WHERE id = ". $id);
         }
 
         Debug::log("Finished saving changelog entries");
@@ -1041,9 +1054,10 @@ class Leaderboard
         }
     }
 
-    public static function setScoreBanStatus($changelogId, $banned)
+    public static function setScoreBanStatus($changelogId, $banned, $comment)
     {
-        Database::query("UPDATE changelog SET banned = '{$banned}'  WHERE id = '{$changelogId}'");
+        $note = Database::getMysqli()->real_escape_string($comment);
+        Database::query("UPDATE changelog SET banned = '{$banned}', note = '{$note}' WHERE id = '{$changelogId}'");
 
         $data = Database::query("SELECT profile_number, map_id FROM changelog WHERE id = '{$changelogId}'");
         $row = $data->fetch_assoc();
@@ -1112,24 +1126,26 @@ class Leaderboard
         $oldBoards = self::getBoard(array("chamber" => $chamber));
         $oldChamberBoard = $oldBoards[$chapter][$chamber];
 
-        $wr = 0;
-        $diff = 0;
-        $keys = array_keys($oldChamberBoard);
-        if ($score <= $oldChamberBoard[$keys[0]]["scoreData"]["score"]) {
-            $wr = 1;
-            $diff = abs($score - $oldChamberBoard[$keys[0]]["scoreData"]["score"]);
+        $banned = $score < 0 ? 1 : 0;
+
+        $preRank = "NULL";
+        $previousId = "NULL";
+
+        if (isset($oldChamberBoard[$profileNumber])) {
+            $preRank = $oldChamberBoard[$profileNumber]["scoreData"]["playerRank"];
+            $previousId = $oldChamberBoard[$profileNumber]["scoreData"]["changelogId"];
+
+            if ($score >= $oldChamberBoard[$profileNumber]["scoreData"]["score"]) {
+                $banned = 1;
+            }
         }
 
-        $comment = Database::getMysqli()->real_escape_string($comment);
-        $preRank = isset($oldChamberBoard[$profileNumber])
-            ? $oldChamberBoard[$profileNumber]["scoreData"]["playerRank"]
-            : "NULL";
-        $previousId = isset($oldChamberBoard[$profileNumber])
-            ? $oldChamberBoard[$profileNumber]["scoreData"]["changelogId"]
-            : "NULL";
+        $comment = $banned != 1
+            ? Database::getMysqli()->real_escape_string($comment)
+            : "Automatic Ban";
 
-        Database::query("INSERT INTO changelog(id, profile_number, score, map_id, wr_gain, previous_id, pre_rank, submission, note)
-              VALUES (NULL, '" . $profileNumber . "','" . $score . "','" . $chamber . "','" . $wr . "', ". $previousId .", ".$preRank.", 1, '".$comment."')
+        Database::query("INSERT INTO changelog(id, profile_number, score, map_id, banned, previous_id, pre_rank, submission, note)
+              VALUES (NULL, '" . $profileNumber . "','" . $score . "','" . $chamber . "','" . $banned . "', ". $previousId .", ".$preRank.", 1, '".$comment."')
             ");
 
         $id = Database::getMysqli()->insert_id;
@@ -1142,6 +1158,10 @@ class Leaderboard
               SET changelog_id = ".$id."
               WHERE profile_number = ". $profileNumber . " AND map_id = " . $chamber);
 
+        if ($banned) {
+            return $id;
+        }
+
         $newBoards = self::getBoard(array("chamber" => $chamber));
         $newChamberBoard = $newBoards[$chapter][$chamber];
 
@@ -1149,14 +1169,17 @@ class Leaderboard
             ? $newChamberBoard[$profileNumber]["scoreData"]["playerRank"]
             : "NULL";
 
-        Database::query("UPDATE changelog
-            SET post_rank = ".$postRank."
-            WHERE id = ". $id);
+        $wr = $postRank == "1" ? "1" : "0";
+
+        Database::query("UPDATE changelog SET post_rank = ".$postRank.", wr_gain = ".$wr." WHERE id = ".$id);
 
         self::setYoutubeID($id, $youtubeID);
 
-        if ($wr) {
+        if ($postRank != "NULL" && $postRank <= Leaderboard::rankForDiscordUpdate) {
             $user = new User($profileNumber);
+            $curWr = $oldChamberBoard[array_keys($oldChamberBoard)[0]]["scoreData"]["score"];
+            $wrDiff = abs($score - $curWr);
+
             $data = [
                 'id' => $id,
                 'timestamp' => new DateTime(),
@@ -1166,7 +1189,7 @@ class Leaderboard
                 'player_avatar' => $user->userData->avatar,
                 'map' => $maps["maps"][$chamber]["mapName"],
                 'score' => Util::formatScoreTime($score),
-                'wr_diff' => Util::formatScoreTime($diff),
+                'wr_diff' => Util::formatScoreTime($wrDiff),
                 'comment' => $comment,
                 'yt' => $youtubeID
             ];
