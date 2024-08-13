@@ -33,7 +33,3 @@ Fetching data:
 2. Updating user data is done by running data/fetchNewProfileData.php. This requires a Steam API developer key which has 
 to be placed in secret/steam_api_key.json. For obtaining an API key, go to 
 https://steamcommunity.com/dev
-
-
-Software licensed under CC Attribution - Non-commercial license.
-https://creativecommons.org/licenses/by-nc/4.0/legalcode
